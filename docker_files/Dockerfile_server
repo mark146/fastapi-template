@@ -1,0 +1,17 @@
+FROM public.ecr.aws/lambda/python:3.10 as python
+
+COPY .. /app
+
+# set work directory
+WORKDIR /app
+
+# set environment variables
+ENV POETRY_VIRTUALENVS_CREATE=false
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+# install dependencies
+RUN python -c 'from urllib.request import urlopen; print(urlopen("https://install.python-poetry.org").read().decode())' | python - && \
+    poetry install --no-root
+
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000","--reload"]

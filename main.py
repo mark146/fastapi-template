@@ -1,10 +1,11 @@
+import uvicorn
+
 from dataclasses import asdict
 from urllib.request import Request
-
 from fastapi import FastAPI
+from mangum import Mangum
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-
 from api.v1.dto.response.ApiResponse import ApiResponse
 from api.v1.router_v1 import router_v1
 
@@ -36,7 +37,7 @@ def include_router(app):
     app.include_router(router_v1, prefix="/v1")
 
 
-def start_application():
+def start_application() -> FastAPI:
     app = FastAPI(title="template api", version="1.0")
 
     app.router.redirect_slashes = False
@@ -48,3 +49,7 @@ def start_application():
 
 
 app = start_application()
+handler = Mangum(app)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
